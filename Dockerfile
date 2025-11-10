@@ -6,9 +6,10 @@ RUN npm install
 
 COPY ..
 # add obfuscator step here...
-RUN npm run build
+
 RUN npm install -g javascript-obfuscator
 RUN javascript-obfuscator ./src --output ./dist
+RUN npm run build
  
 
 FROM node:18-slim
