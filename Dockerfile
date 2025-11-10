@@ -1,22 +1,33 @@
-FROM node:18 AS builder 
+# ---------- STAGE 1: BUILD + OBFUSCATE ----------
+FROM node:18 AS builder
 WORKDIR /app
 
+# copy package files
 COPY package*.json ./
-RUN npm install 
 
+RUN npm install
+
+# copy actual code
 COPY . .
-# add obfuscator step here...
 
+# install obfuscator
 RUN npm install -g javascript-obfuscator
-RUN javascript-obfuscator ./src --output ./dist
-RUN npm run build
- 
 
+# obfuscate index.js only
+RUN mkdir -p dist
+RUN javascript-obfuscator index.js --output dist/index.js
+
+
+# ---------- STAGE 2: FINAL RUNTIME ----------
 FROM node:18-slim
 WORKDIR /app
-COPY --from=builder /app/dist ./dist
 
-# Expose port (your app listens on)
+# Copy only obfuscated output
+COPY --from=builder /app/dist ./dist
+COPY package*.json ./
+
+RUN npm install --production
+
 EXPOSE 3000
 
 CMD ["node", "dist/index.js"]
