@@ -1,20 +1,21 @@
-# Use Node.js base image
-FROM node:18-alpine
-
-# Set working directory inside container
+FROM node:18 AS builder 
 WORKDIR /app
 
-# Copy package files first (for caching dependencies)
-COPY package*.json ./
+COPY package*.js ./
+RUN npm install 
 
-# Install dependencies
-RUN npm install --production
+COPY ..
+# add obfuscator step here...
+RUN npm run build
+RUN npm install -g javascript-obfuscator
+RUN javascript-obfuscator ./src --output ./dist
+ 
 
-# Copy the rest of the code
-COPY . .
+FROM node:18-slim
+WORKDIR /app
+COPY --from=builder /app/dist ./dist
 
 # Expose port (your app listens on)
 EXPOSE 3000
 
-# Start the app
-CMD ["npm", "start"]
+CMD ["node", "dist/index.js"]
