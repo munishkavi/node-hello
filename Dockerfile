@@ -1,5 +1,5 @@
 # ---------- STAGE 1: BUILD + OBFUSCATE ----------
-FROM node:18 AS builder
+FROM node:18-alpine
 WORKDIR /app
 
 # copy package files
