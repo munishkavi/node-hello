@@ -26,10 +26,10 @@ RUN javascript-obfuscator index.js --output dist/index.js
 # Copy only obfuscated output
 #COPY --from=builder /app/dist ./dist
 #COPY package*.json ./
-Run rm -f index.js && javascript-obfuscator index.js --output dist/index.js
+RUN rm -f index.js && javascript-obfuscator index.js --output dist/index.js
 
 RUN npm prune --production
-Run npm cache clean -f
+RUN npm cache clean -f
 EXPOSE 3000
 
 CMD ["node", "dist/index.js"]
